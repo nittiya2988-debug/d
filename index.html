@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Lumina Electric Air - เว็บแอปช่างบริการ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap');
+:root {
+  --blue-primary: #0879d9;
+  --blue-deep: #0551a0;
+  --blue-dark: #032a52;
+  --blue-soft: #eef8ff;
+  --blue-card-bg: #e2f2fe;
+  --white: #ffffff;
+  --text-main: #112d4e;
+  --text-muted: #647a90;
+  --line: #d2e6f5;
+  --green: #0a9b63;
+  --green-bg: #e8faf2;
+  --orange: #c47a00;
+  --orange-bg: #fff6e8;
+  --red: #d32f2f;
+  --red-bg: #ffebee;
+  --radius-card: 24px;
+  --radius-inner: 16px;
+  --shadow: 0 10px 28px rgba(5, 81, 160, 0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans Thai', sans-serif; -webkit-tap-highlight-color: transparent; }
+body {
+  background-color: #081a2f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+/* กรอบจำลองมือถือ + แท็บเล็ต */
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+  background: linear-gradient(180deg, var(--blue-primary) 0%, #1085e6 130px, #f4f9fd 130px, #f4f9fd 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 600px) {
+  .app-container {
+    max-width: 640px;
+    height: 95vh;
+    max-height: 920px;
+    border-radius: 32px;
+    border: 10px solid #1a2f4c;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+  }
+}
+@media (min-width: 900px) {
+  .app-container {
+    max-width: 720px;
+  }
+}
+/* ดาวประกายวิงค์ */
+.stars-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle 2.8s ease-in-out infinite;
+  box-shadow: 0 0 6px 2px rgba(255,255,255,0.7);
+}
+.star::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 10px; height: 1px;
+  background: rgba(255,255,255,0.9);
+  transform: translate(-50%, -50%);
+}
+.star::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 1px; height: 10px;
+  background: rgba(255,255,255,0.9);
+  transform: translate(-50%, -50%);
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.4); }
+  40% { opacity: 1; transform: scale(1); }
+  60% { opacity: 0.7; transform: scale(0.85); }
+}
+/* Header ด้านบน */
+.header {
+  padding: 16px 18px 10px;
+  color: var(--white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  position: relative;
+  gap: 8px;
+}
+.brand-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-top-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--white); display: inline-block; }
+.status-top-btn.on { background: var(--green); }
+.status-top-btn.off { background: var(--red); }
+/* ปุ่มโทรแอดมินด่วน */
+.call-admin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  color: var(--white);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.2s;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.call-admin-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.4); }
+.call-admin-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.call-admin-btn:hover { background: rgba(255,255,255,0.35); }
+/* พื้นที่เนื้อหา Scroll */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 90px;
+  scroll-behavior: smooth;
+  position: relative;
+  z-index: 1;
+  -webkit-overflow-scrolling: touch;
+}
+.page { display: none; }
+.page.active { display: block; animation: slideUp 0.25s cubic-bezier(0.25, 1, 0.5, 1); }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* การ์ดสไตล์เว้าโค้ง Minimal */
+.greeting-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.greeting-card::after {
+  content: '✦';
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  font-size: 18px;
+  color: var(--blue-primary);
+  opacity: 0.25;
+  animation: softSpark 3s ease-in-out infinite;
+}
+@keyframes softSpark {
+  0%, 100% { opacity: 0.2; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.45; transform: scale(1.15) rotate(15deg); }
+}
+.greeting-card h1 { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+.greeting-card p { font-size: 12px; color: var(--text-muted); }
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 16px 0 10px;
+}
+.section-head h2 { font-size: 15px; font-weight: 700; color: var(--text-main); }
+.btn-small {
+  background: var(--blue-soft);
+  color: var(--blue-primary);
+  border: 1px solid var(--line);
+  padding: 5px 12px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+/* Grid สถิติ */
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+.stat-box {
+  background: var(--white);
+  border-radius: var(--radius-inner);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+}
+.stat-box span { font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+.stat-box strong { font-size: 18px; color: var(--text-main); font-weight: 800; }
+/* การ์ดรายการงาน */
+.job-item {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+}
+.job-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.customer-name { font-size: 16px; font-weight: 700; color: var(--text-main); }
+.status-tag {
+  font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700;
+}
+.status-tag.orange { background: var(--orange-bg); color: var(--orange); }
+.status-tag.green { background: var(--green-bg); color: var(--green); }
+.job-info-text { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px; }
+.job-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  border-top: 1px dashed var(--line);
+  padding-top: 12px;
+}
+.btn-action {
+  padding: 8px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: filter 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-action:active { filter: brightness(0.9); }
+.btn-action.sec { background: var(--blue-soft); color: var(--blue-deep); }
+.btn-action.outline { background: transparent; border: 1px solid var(--line); color: var(--text-main); }
+.btn-action.main { background: var(--blue-primary); color: var(--white); }
+.btn-action.success { background: var(--green); color: var(--white); }
+/* ปุ่มลงเวลา */
+.clock-banner { display: flex; gap: 8px; margin-bottom: 16px; }
+.clock-btn {
+  flex: 1; padding: 12px; border-radius: var(--radius-inner); color: var(--white);
+  font-size: 12px; font-weight: 700; border: none; cursor: pointer; text-align: center;
+}
+.clock-btn.in { background: var(--green); }
+.clock-btn.out { background: var(--red); }
+/* การ์ดทีมช่าง */
+.team-card {
+  background: var(--white);
+  border-radius: var(--radius-inner);
+  padding: 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+}
+.team-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.avatar-box {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--blue-soft); color: var(--blue-primary);
+  display: grid; place-items: center; font-weight: 700; font-size: 15px; border: 1px solid var(--line);
+}
+.team-details-list {
+  display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; font-size: 11px;
+}
+.team-row { display: flex; justify-content: space-between; }
+/* การ์ดโบนัส */
+.bonus-card {
+  background: var(--white);
+  border-radius: var(--radius-inner);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  gap: 10px;
+}
+/* ช่องแชท */
+.chat-container {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  height: 320px;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+.msg-bubble { max-width: 80%; padding: 10px 12px; border-radius: 14px; font-size: 12px; line-height: 1.5; }
+.msg-bubble.admin { background: var(--blue-soft); color: var(--text-main); align-self: flex-start; border: 1px solid var(--line); }
+.msg-bubble.tech { background: var(--blue-primary); color: var(--white); align-self: flex-end; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input-row input {
+  flex: 1; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 12px; outline: none; background: var(--white);
+}
+/* รายการโปรไฟล์ */
+.info-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+}
+.info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f4f8; font-size: 12px; }
+.info-row:last-child { border: none; }
+.info-label { color: var(--text-muted); }
+.info-val { font-weight: 700; color: var(--text-main); }
+/* แถบเมนูล่าง สไตล์ Minimal ไอคอน + ข้อความ */
+.bottom-nav {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 76px; background: var(--white);
+  display: flex; justify-content: space-around; align-items: center;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06); z-index: 30;
+  border-top: 1px solid var(--line);
+  padding: 0 4px 8px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+.nav-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer; width: 25%; height: 100%;
+  color: var(--text-muted); font-weight: 500; font-size: 11px; gap: 4px;
+  transition: color 0.2s, transform 0.1s;
+}
+.nav-btn svg {
+  width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  transition: stroke 0.2s;
+}
+.nav-btn.active { color: var(--blue-primary); font-weight: 700; }
+.nav-btn.active svg { stroke: var(--blue-primary); }
+.nav-btn span.label { font-size: 11px; }
+/* Pop-up Modal & Toast */
+.modal-bg {
+  position: absolute; inset: 0; background: rgba(3, 42, 82, 0.45); z-index: 50;
+  display: none; place-items: center; padding: 20px; backdrop-filter: blur(4px);
+}
+.modal-bg.show { display: grid; }
+.modal-box { background: var(--white); border-radius: var(--radius-card); padding: 20px; width: 100%; max-height: 85vh; overflow-y: auto; }
+.toast-msg {
+  position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+  background: var(--blue-dark); color: var(--white); padding: 8px 16px; border-radius: 20px;
+  font-size: 11px; font-weight: 500; z-index: 60; display: none; box-shadow: 0 4px 14px rgba(0,0,0,0.2); text-align: center; width: 85%;
+}
+/* ========== LOGIN SCREEN ========== */
+.login-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  background: linear-gradient(165deg, #0551a0 0%, #0879d9 40%, #0a8ff0 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+.login-screen.hidden { display: none; }
+.login-stars { position: absolute; inset: 0; pointer-events: none; }
+.login-card {
+  background: var(--white);
+  border-radius: 28px;
+  padding: 28px 24px 24px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 2;
+}
+.login-logo {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.login-logo .logo-text {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--blue-primary);
+  letter-spacing: -0.5px;
+}
+.login-logo .logo-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.login-logo .sparkle {
+  display: inline-block;
+  color: #7ec8ff;
+  animation: softSpark 2.5s ease-in-out infinite;
+}
+.login-field {
+  margin-bottom: 14px;
+}
+.login-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  font-size: 14px;
+  outline: none;
+  background: #f8fbfe;
+  color: var(--text-main);
+  transition: border-color 0.2s;
+}
+.login-field input:focus {
+  border-color: var(--blue-primary);
+  background: #fff;
+}
+.login-field input::placeholder {
+  color: #a0b4c8;
+}
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 14px;
+  background: var(--blue-primary);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: filter 0.2s, transform 0.1s;
+}
+.login-btn:active { filter: brightness(0.92); transform: scale(0.98); }
+.login-error {
+  color: var(--red);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 12px;
+  min-height: 18px;
+  display: none;
+}
+.login-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  line-height: 1.5;
+}
+/* Tablet adjustments */
+@media (min-width: 600px) {
+  .header { padding: 20px 24px 12px; }
+  .brand-name { font-size: 24px; }
+  .main-content { padding: 0 22px 95px; }
+  .greeting-card h1 { font-size: 18px; }
+  .stat-box strong { font-size: 20px; }
+  .customer-name { font-size: 17px; }
+  .bottom-nav { height: 80px; }
+  .nav-btn span.label { font-size: 12px; }
+  .login-card { padding: 36px 32px 28px; max-width: 400px; }
+}
+</style>
+</head>
+<body>
+<div class="app-container" id="appRoot">
+
+  <!-- ========== LOGIN SCREEN ========== -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-stars" id="loginStars"></div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-text">LUMINA <span class="sparkle">✦</span></div>
+        <div class="logo-sub">ระบบช่างบริการ</div>
+      </div>
+      <div class="login-field">
+        <label for="loginName">อีเมล</label>
+        <input type="email" id="loginName" placeholder="กรอกอีเมลที่ลงทะเบียนไว้" autocomplete="username" enterkeyhint="next">
+      </div>
+      <div class="login-field">
+        <label for="loginPass">รหัสผ่าน</label>
+        <input type="password" id="loginPass" placeholder="กรอกรหัสผ่าน" autocomplete="current-password" enterkeyhint="go">
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="handleLogin()">เข้าสู่ระบบ</button>
+      <div class="login-error" id="loginError">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
+      <div class="login-hint">กรุณาใช้บัญชีที่ได้รับจากแอดมินเท่านั้น</div>
+    </div>
+  </div>
+
+  <!-- ดาวประกายพื้นหลัง (หลัง login) -->
+  <div class="stars-bg" id="appStars"></div>
+
+  <!-- Top Header -->
+  <header class="header">
+    <div>
+      <div class="brand-name">LUMINA</div>
+    </div>
+    <div class="header-right">
+      <div class="status-top-btn on" id="topBadge">
+        <span class="status-dot"></span><span id="topBadgeText">กำลังปฏิบัติงาน</span>
+      </div>
+      <!-- ปุ่มโทรแอดมินด่วน -->
+      <a href="tel:021234567" class="call-admin-btn" title="โทรหาแอดมินด่วน" aria-label="โทรหาแอดมินด่วน">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+      </a>
+    </div>
+  </header>
+
+  <div class="toast-msg" id="toast"></div>
+
+  <!-- Scrollable Main Content -->
+  <main class="main-content">
+    
+    <!-- MENU 1: หน้าหลัก -->
+    <section class="page active" id="menu-home">
+      <div class="greeting-card">
+        <h1>สวัสดี ช่างพีช (หัวหน้าทีม)</h1>
+        <p id="currentDate"></p>
+      </div>
+      <div class="section-head"><h2>ภาพรวมการปฏิบัติงานวันนี้</h2></div>
+      <div class="stats-grid">
+        <div class="stat-box"><span>งานวันนี้ทั้งหมด</span><strong id="statTotal">0 งาน</strong></div>
+        <div class="stat-box"><span>งานที่เสร็จสิ้น</span><strong id="statCompleted">0 งาน</strong></div>
+        <div class="stat-box"><span>กำลังดำเนินการ</span><strong id="statInProg">0 งาน</strong></div>
+        <div class="stat-box"><span>สถานะทีม</span><strong>ทีม A</strong></div>
+      </div>
+      <div class="section-head">
+        <h2>รายการงานถัดไปและสถานะการบริการ</h2>
+        <button class="btn-small" onclick="showToast('รีเฟรชข้อมูลเรียบร้อยแล้ว'); loadTechnicianJobs();">รีเฟรชข้อมูล</button>
+      </div>
+      <div id="technicianJobList"></div>
+    </section>
+
+    <!-- MENU 2: ทีมช่าง & โบนัส -->
+    <section class="page" id="menu-team">
+      <div class="section-head"><h2>สมาชิกทีมช่างปฏิบัติการ</h2></div>
+      <!-- ช่าง 1 -->
+      <div class="team-card">
+        <div class="team-head">
+          <div class="avatar-box">พีช</div>
+          <div>
+            <b style="font-size:14px; color:var(--text-main);">ช่างพีช (หัวหน้าทีม)</b>
+            <div style="font-size:11px; color:var(--text-muted);">ตำแหน่ง: หัวหน้าทีม | อายุ 25 ปี</div>
+          </div>
+        </div>
+        <div class="team-details-list">
+          <div class="team-row"><span class="info-label">เบอร์โทรศัพท์:</span><b>081-111-2233</b></div>
+          <div class="team-row"><span class="info-label">ความเชี่ยวชาญ:</span><b>ระบบ Inverter และงานซ่อมบอร์ด</b></div>
+          <div class="team-row"><span class="info-label">ประสบการณ์:</span><b>5 ปี</b></div>
+          <div class="team-row"><span class="info-label">เวลาเข้า-ออกวันนี้:</span><b id="teamClockPeach">08:15 น. - -</b></div>
+          <div class="team-row"><span class="info-label">แต้มสะสม:</span><b>1,250 แต้ม</b></div>
+        </div>
+      </div>
+      <!-- ช่าง 2 -->
+      <div class="team-card">
+        <div class="team-head">
+          <div class="avatar-box">ปั้น</div>
+          <div>
+            <b style="font-size:14px; color:var(--text-main);">ช่างปั้น (ผู้ช่วยช่าง)</b>
+            <div style="font-size:11px; color:var(--text-muted);">ตำแหน่ง: ผู้ช่วยช่าง | อายุ 23 ปี</div>
+          </div>
+        </div>
+        <div class="team-details-list">
+          <div class="team-row"><span class="info-label">เบอร์โทรศัพท์:</span><b>081-111-2234</b></div>
+          <div class="team-row"><span class="info-label">ความเชี่ยวชาญ:</span><b>ติดตั้งแอร์และเดินระบบไฟ</b></div>
+          <div class="team-row"><span class="info-label">ประสบการณ์:</span><b>3 ปี</b></div>
+          <div class="team-row"><span class="info-label">เวลาเข้า-ออกวันนี้:</span><b>08:18 น. - -</b></div>
+          <div class="team-row"><span class="info-label">แต้มสะสม:</span><b>900 แต้ม</b></div>
+        </div>
+      </div>
+      <!-- ช่าง 3 -->
+      <div class="team-card">
+        <div class="team-head">
+          <div class="avatar-box">ทิว</div>
+          <div>
+            <b style="font-size:14px; color:var(--text-main);">ช่างทิว (ช่างฝึกหัด)</b>
+            <div style="font-size:11px; color:var(--text-muted);">ตำแหน่ง: ช่างฝึกหัด | อายุ 21 ปี</div>
+          </div>
+        </div>
+        <div class="team-details-list">
+          <div class="team-row"><span class="info-label">เบอร์โทรศัพท์:</span><b>081-111-2235</b></div>
+          <div class="team-row"><span class="info-label">ความเชี่ยวชาญ:</span><b>ล้างแอร์และบำรุงรักษา</b></div>
+          <div class="team-row"><span class="info-label">ประสบการณ์:</span><b>1 ปี</b></div>
+          <div class="team-row"><span class="info-label">เวลาเข้า-ออกวันนี้:</span><b>08:20 น. - -</b></div>
+          <div class="team-row"><span class="info-label">แต้มสะสม:</span><b>600 แต้ม</b></div>
+        </div>
+      </div>
+      <!-- โบนัสอยู่ข้างใต้ข้อมูลช่าง -->
+      <div class="section-head" style="margin-top:20px;"><h2>คะแนนสะสมและระบบสวัสดิการโบนัส</h2></div>
+      
+      <div class="stats-grid">
+        <div class="stat-box"><span>แต้มสะสมปัจจุบัน</span><strong id="pointsDisplay">1,250 แต้ม</strong></div>
+        <div class="stat-box"><span>จำนวนงานทั้งหมด</span><strong>486 งาน</strong></div>
+        <div class="stat-box"><span>อัตราได้รับรีวิวดี</span><strong>+12%</strong></div>
+        <div class="stat-box"><span>ตรงต่อเวลา</span><strong>+98%</strong></div>
+      </div>
+      <div class="section-head"><h2 style="font-size:13px;">รายการแลกโบนัส</h2></div>
+      <div class="bonus-card" id="bonus-1">
+        <div>
+          <b style="font-size:12px; color:var(--text-main);">1. ส่วนลดชมภาพยนตร์ 200 บาท</b>
+          <div style="font-size:10px; color:var(--text-muted);">ใช้ 500 แต้ม</div>
+        </div>
+        <button class="btn-action sec" onclick="redeemBonus('ส่วนลดชมภาพยนตร์ 200 บาท', 500, 'bonus-1')">แลกรับสิทธิ์</button>
+      </div>
+      <div class="bonus-card" id="bonus-2">
+        <div>
+          <b style="font-size:12px; color:var(--text-main);">2. ส่วนลดร้านอาหาร 500 บาท</b>
+          <div style="font-size:10px; color:var(--text-muted);">ใช้ 800 แต้ม</div>
+        </div>
+        <button class="btn-action sec" onclick="redeemBonus('ส่วนลดร้านอาหาร 500 บาท', 800, 'bonus-2')">แลกรับสิทธิ์</button>
+      </div>
+      <div class="bonus-card" id="bonus-3">
+        <div>
+          <b style="font-size:12px; color:var(--text-main);">3. เงินช่วยเหลือจิปาถะ 2,000 บาท</b>
+          <div style="font-size:10px; color:var(--text-muted);">ใช้ 1,000 แต้ม</div>
+        </div>
+        <button class="btn-action sec" onclick="redeemBonus('เงินช่วยเหลือค่าใช้จ่ายจิปาถะ 2,000 บาท', 1000, 'bonus-3')">แลกรับสิทธิ์</button>
+      </div>
+      <div class="bonus-card" id="bonus-4">
+        <div>
+          <b style="font-size:12px; color:var(--text-main);">4. โบนัสพิเศษประจำเดือน เพิ่ม 30%</b>
+          <div style="font-size:10px; color:var(--text-muted);">ใช้ 3,500 แต้ม</div>
+        </div>
+        <button class="btn-action sec" onclick="redeemBonus('โบนัสพิเศษประจำเดือน เพิ่ม 30%', 3500, 'bonus-4')">แลกรับสิทธิ์</button>
+      </div>
+      <div class="bonus-card" id="bonus-5">
+        <div>
+          <b style="font-size:12px; color:var(--text-main);">5. วันหยุดพิเศษ 1 สัปดาห์ (เลือกวันเอง)</b>
+          <div style="font-size:10px; color:var(--text-muted);">ใช้ 4,000 แต้ม</div>
+        </div>
+        <button class="btn-action sec" onclick="redeemBonus('วันหยุดพิเศษ 1 สัปดาห์', 4000, 'bonus-5')">แลกรับสิทธิ์</button>
+      </div>
+    </section>
+
+    <!-- MENU 3: ติดต่อแอดมิน -->
+    <section class="page" id="menu-admin">
+      <div style="background:#fff8e1; border:1px solid #ffe082; padding:12px; border-radius:14px; margin-bottom:12px; font-size:11px; color:#795548; line-height:1.5;">
+        <b>ข้อกำหนดความปลอดภัยและระเบียบปฏิบัติการ:</b><br>
+        เพื่อความปลอดภัยของลูกค้าและทีมช่าง ไม่อนุญาตให้ช่างติดต่อกับลูกค้าโดยตรงโดยไม่ผ่านแอดมิน ทุกการสื่อสารต้องทำผ่านฝ่ายประสานงานกลางเท่านั้น (เวลาทำการ: 08:00 - 18:00 น.)
+      </div>
+      <div class="chat-container" id="chatBox">
+        <div class="msg-bubble admin">สวัสดีค่ะช่างพีช ฝ่ายแอดมินยินดีให้บริการค่ะ หากมีการปรับเปลี่ยนเคสงานหรือต้องการสอบถามข้อมูลเพิ่มเติมแจ้งได้เลยค่ะ</div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="พิมพ์ข้อความถึงแอดมิน..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+        <button class="btn-action main" style="padding:0 16px;" onclick="sendChatMessage()">ส่ง</button>
+      </div>
+    </section>
+
+    <!-- MENU 4: โปรไฟล์ช่าง -->
+    <section class="page" id="menu-profile">
+      <!-- ปุ่มเข้า-เลิกงาน ย้ายมาอยู่ที่นี่ -->
+      <div class="clock-banner">
+        <button class="clock-btn in" onclick="setWorkStatus(true)">เข้าปฏิบัติงาน</button>
+        <button class="clock-btn out" onclick="setWorkStatus(false)">เลิกปฏิบัติงาน</button>
+      </div>
+
+      <div class="info-card">
+        <h2 style="font-size:14px; margin-bottom:10px; color:var(--text-main);">ข้อมูลบัญชีผู้ใช้งาน</h2>
+        <div class="info-row"><span class="info-label">ชื่อช่าง</span><span class="info-val">ช่างพีช</span></div>
+        <div class="info-row"><span class="info-label">ทีม</span><span class="info-val">ทีม A</span></div>
+        <div class="info-row"><span class="info-label">ตำแหน่ง</span><span class="info-val">หัวหน้าทีม</span></div>
+        <div class="info-row"><span class="info-label">เบอร์โทรศัพท์</span><span class="info-val">081-111-2233</span></div>
+        <div class="info-row"><span class="info-label">อายุ</span><span class="info-val">25 ปี</span></div>
+        <div class="info-row"><span class="info-label">ความเชี่ยวชาญ</span><span class="info-val">ระบบ Inverter และงานซ่อมบอร์ด</span></div>
+        <div class="info-row"><span class="info-label">ประสบการณ์</span><span class="info-val">5 ปี</span></div>
+      </div>
+      <div class="info-card">
+        <h2 style="font-size:14px; margin-bottom:10px; color:var(--text-main);">สถานะการปฏิบัติงาน</h2>
+        <div class="info-row"><span class="info-label">สถานะปัจจุบัน</span><span class="info-val" id="profileWorkStatus" style="color:var(--green);">กำลังปฏิบัติงาน</span></div>
+        <div class="info-row"><span class="info-label">เวลาเข้า - ออกวันนี้</span><span class="info-val" id="profileClockTime">08:15 น. - -</span></div>
+        <div class="info-row"><span class="info-label">แต้มสะสม</span><span class="info-val" id="profilePoints">1,250 แต้ม</span></div>
+        <div class="info-row"><span class="info-label">งานที่ได้รับจาก Admin วันนี้</span><span class="info-val" id="profileTotal">0 งาน</span></div>
+        <div class="info-row"><span class="info-label">งานที่กำลังปฏิบัติงาน</span><span class="info-val" id="profileInProg">0 งาน</span></div>
+        <div class="info-row"><span class="info-label">งานที่เสร็จสิ้นวันนี้</span><span class="info-val" id="profileCompleted">0 งาน</span></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- แถบเมนูล่าง พร้อมไอคอนสัญลักษณ์มินิมอล SVG -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <span class="label">หน้าหลัก</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('team')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      <span class="label">ทีมช่าง & โบนัส</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('admin')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <span class="label">ติดต่อแอดมิน</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span class="label">โปรไฟล์ช่าง</span>
+    </button>
+  </nav>
+
+  <!-- Modal Pop-up -->
+  <div class="modal-bg" id="modal">
+    <div class="modal-box">
+      <div id="modalContent"></div>
+      <button class="btn-action main" style="width:100%; margin-top:14px;" onclick="closeModal()">ปิดหน้าต่าง</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Repointed at the project's own Supabase project (was previously pointed at
+// a different/old project: yjgnodyfqwmvgivjzxmu). Paste the real publishable
+// key below — it's safe to ship client-side, RLS is what protects the data.
+const SUPABASE_URL = "https://juyzslygeglbxninetwr.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_3ptYldp8jyZtT_KOHGwWZQ_aNN4jV0q";
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
+// ========== LOGIN (real Supabase Auth — replaces the hardcoded name/pass check) ==========
+let CURRENT_TECH_USER = null;   // auth user
+let TECHNICIAN_ID = null;       // technicians.id (== auth user id)
+let TECHNICIAN_TEAM = null;     // e.g. 'ทีม A'
+let TECHNICIAN_NAME = null;
+let TECHNICIAN_POSITION = null;
+
+async function loadTechnicianIdentity(){
+  const { data: profile, error: profErr } = await supabaseClient
+    .from('profiles').select('full_name, phone').eq('id', CURRENT_TECH_USER.id).single();
+  if (profErr) { showToast('โหลดข้อมูลโปรไฟล์ไม่สำเร็จ'); return false; }
+  const { data: tech, error: techErr } = await supabaseClient
+    .from('technicians')
+    .select('position, technician_code, technician_teams(name)')
+    .eq('id', CURRENT_TECH_USER.id).single();
+  if (techErr) { showToast('บัญชีนี้ยังไม่ถูกตั้งค่าเป็นช่างเทคนิค'); return false; }
+  TECHNICIAN_ID = CURRENT_TECH_USER.id;
+  TECHNICIAN_NAME = profile.full_name;
+  TECHNICIAN_POSITION = tech.position;
+  TECHNICIAN_TEAM = tech.technician_teams?.name || '-';
+  return true;
+}
+
+async function handleLogin() {
+  const email = document.getElementById('loginName').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    console.error('Supabase sign-in error:', error);
+    const msg = (error.message || '').toLowerCase();
+    if (msg.includes('api key') || msg.includes('apikey')) {
+      errEl.textContent = 'ตั้งค่าระบบไม่สมบูรณ์ (SUPABASE_PUBLISHABLE_KEY ยังไม่ถูกต้อง) กรุณาแจ้งผู้ดูแลระบบ';
+    } else if (msg.includes('fetch') || msg.includes('network')) {
+      errEl.textContent = 'เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่';
+    } else {
+      errEl.textContent = 'อีเมลหรือรหัสผ่านไม่ถูกต้อง';
+    }
+    errEl.style.display = 'block';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+    return;
+  }
+  CURRENT_TECH_USER = data.user;
+  const ok = await loadTechnicianIdentity();
+  if (!ok) { await supabaseClient.auth.signOut(); return; }
+
+  errEl.style.display = 'none';
+  document.getElementById('loginScreen').classList.add('hidden');
+  showToast(`ยินดีต้อนรับ ${TECHNICIAN_NAME} เข้าสู่ระบบเรียบร้อย`);
+  await loadTechnicianJobs();
+  await ensureTechChatConversation();
+  await loadTechChatHistory();
+  await loadAttendanceStatus();
+  await loadPointsTotal();
+  subscribeTechChat();
+  subscribeTechJobs();
+}
+
+// กด Enter ที่ช่องรหัสผ่านเพื่อ login
+document.addEventListener('DOMContentLoaded', () => {
+  const passInput = document.getElementById('loginPass');
+  const nameInput = document.getElementById('loginName');
+  if (passInput) {
+    passInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  }
+  if (nameInput) {
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('loginPass').focus();
+    });
+  }
+});
+
+// Restore an existing Supabase session on load (replaces the sessionStorage flag)
+(async function checkExistingTechSession(){
+  const { data } = await supabaseClient.auth.getSession();
+  if (!data.session) return;
+  CURRENT_TECH_USER = data.session.user;
+  const ok = await loadTechnicianIdentity();
+  if (!ok) { await supabaseClient.auth.signOut(); return; }
+  document.getElementById('loginScreen').classList.add('hidden');
+  await loadTechnicianJobs();
+  await ensureTechChatConversation();
+  await loadTechChatHistory();
+  await loadAttendanceStatus();
+  await loadPointsTotal();
+  subscribeTechChat();
+  subscribeTechJobs();
+})();
+
+// สร้างดาวประกาย
+function createStars(containerId, count) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = (Math.random() * 2.8) + 's';
+    star.style.animationDuration = (2.2 + Math.random() * 1.6) + 's';
+    const size = 2 + Math.random() * 3;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    container.appendChild(star);
+  }
+}
+createStars('loginStars', 28);
+createStars('appStars', 18);
+
+// สลับ 4 เมนูหลัก
+function switchTab(tabId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  
+  document.getElementById(`menu-${tabId}`).classList.add('active');
+  
+  const idx = ['home', 'team', 'admin', 'profile'].indexOf(tabId);
+  if(idx !== -1) document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+}
+
+// วันที่ปัจจุบัน
+document.getElementById('currentDate').textContent =
+  new Intl.DateTimeFormat('th-TH', {
+    dateStyle: 'full'
+  }).format(new Date());
+
+// Toast Notification
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+
+// Modal Control
+function openModal(html) {
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+// สถานะการเข้า-เลิกงาน — เขียนลง attendance_logs จริง (คีย์: ช่างคนนี้ + วันนี้)
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+
+async function loadAttendanceStatus(){
+  const { data } = await supabaseClient.from('attendance_logs').select('*')
+    .eq('technician_id', TECHNICIAN_ID).eq('work_date', todayStr()).maybeSingle();
+  applyAttendanceUI(data);
+}
+
+function applyAttendanceUI(row){
+  const badge = document.getElementById('topBadge');
+  const badgeText = document.getElementById('topBadgeText');
+  const profileStatus = document.getElementById('profileWorkStatus');
+  const isWorking = !!(row && row.clock_in && !row.clock_out);
+  const fmt = t => t ? new Date(t).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'}) + ' น.' : '-';
+
+  if (isWorking) {
+    badge.className = 'status-top-btn on'; badgeText.textContent = 'กำลังปฏิบัติงาน';
+    profileStatus.textContent = 'กำลังปฏิบัติงาน'; profileStatus.style.color = 'var(--green)';
+  } else {
+    badge.className = 'status-top-btn off'; badgeText.textContent = 'นอกเวลาปฏิบัติงาน';
+    profileStatus.textContent = 'นอกเวลาปฏิบัติงาน'; profileStatus.style.color = 'var(--red)';
+  }
+  const clockText = `${fmt(row?.clock_in)} - ${fmt(row?.clock_out)}`;
+  const profileClock = document.getElementById('profileClockTime');
+  const teamClock = document.getElementById('teamClockPeach');
+  if (profileClock) profileClock.textContent = clockText;
+  if (teamClock) teamClock.textContent = clockText;
+}
+
+async function setWorkStatus(clockingIn) {
+  const nowIso = new Date().toISOString();
+  const { data: existing } = await supabaseClient.from('attendance_logs').select('id')
+    .eq('technician_id', TECHNICIAN_ID).eq('work_date', todayStr()).maybeSingle();
+
+  let result;
+  if (!existing) {
+    result = await supabaseClient.from('attendance_logs')
+      .insert({ technician_id: TECHNICIAN_ID, work_date: todayStr(), clock_in: nowIso })
+      .select().single();
+  } else {
+    result = await supabaseClient.from('attendance_logs')
+      .update(clockingIn ? { clock_in: nowIso, clock_out: null } : { clock_out: nowIso })
+      .eq('id', existing.id).select().single();
+  }
+  if (result.error) { showToast('บันทึกเวลาไม่สำเร็จ กรุณาลองใหม่'); return; }
+  applyAttendanceUI(result.data);
+  showToast(clockingIn
+    ? 'เข้าปฏิบัติงานเรียบร้อย: ยินดีต้อนรับ ขอให้เป็นวันที่ดีครับ'
+    : 'บันทึกเลิกงานเรียบร้อย: ขอให้เดินทางกลับบ้านโดยสวัสดิภาพ');
+}
+
+// ===============================
+// ระบบงานช่างเชื่อมต่อ Supabase (real technician identity, real customer/
+// property data via joins — no more hardcoded TECHNICIAN_ID or TECH_CUSTOMERS)
+// ===============================
+let TECHNICIAN_JOBS = [];
+
+// the 5-step flow the brief requires, "พร้อมเริ่มงาน" first — this step did
+// not exist anywhere in the original code, which started at "กำลังไป"
+const JOB_STATUS_FLOW = {
+  assigned:    { text: 'รอช่างกดพร้อมเริ่มงาน', cls: 'orange', next: 'ready',       nextLabel: '1. พร้อมเริ่มงาน' },
+  ready:       { text: 'พร้อมเริ่มงาน',         cls: 'orange', next: 'on_the_way',  nextLabel: '2. กำลังไป' },
+  on_the_way:  { text: 'กำลังไป',               cls: 'orange', next: 'arrived',     nextLabel: '3. ถึงหน้างานแล้ว' },
+  arrived:     { text: 'ถึงหน้างานแล้ว',        cls: 'orange', next: 'in_progress', nextLabel: '4. กำลังดำเนินงาน' },
+  in_progress: { text: 'กำลังดำเนินงาน',        cls: 'main',   next: 'completed',   nextLabel: '5. งานเสร็จสิ้น' },
+  completed:   { text: 'เสร็จสิ้น',             cls: 'green',  next: null,          nextLabel: null },
+};
+
+// -------------------------------
+// โหลดงานของช่างที่ login อยู่จาก Supabase (เห็นเฉพาะงานที่ได้รับมอบหมาย)
+// -------------------------------
+async function loadTechnicianJobs(){
+  const box = document.getElementById('technicianJobList');
+  if(!box) return;
+  box.innerHTML = `<div class="job-item"><div class="job-info-text" style="text-align:center;">กำลังโหลดข้อมูลงาน...</div></div>`;
+
+  const { data, error } = await supabaseClient
+    .from('job_orders')
+    .select(`
+      id, job_code, status, progress_percent, service_type,
+      scheduled_date, scheduled_time_slot, details,
+      customer:profiles!job_orders_customer_id_fkey(full_name, customer_code),
+      property:customer_properties(address),
+      device:customer_devices(room, error_code, status),
+      booking:bookings(booking_code)
+    `)
+    .eq('assigned_tech_id', TECHNICIAN_ID)
+    .neq('status', 'cancelled')
+    .order('scheduled_date', { ascending: true })
+    .order('scheduled_time_slot', { ascending: true });
+  if(error){
+    console.error('โหลดงานช่างไม่สำเร็จ:', error);
+    box.innerHTML = `<div class="job-item"><div class="job-info-text" style="text-align:center;">ไม่สามารถโหลดข้อมูลงานได้</div></div>`;
+    return;
+  }
+  TECHNICIAN_JOBS = data || [];
+  renderTechnicianJobs();
+  updateDashboardStats();
+}
+
+// -------------------------------
+// แสดงรายการงาน
+// -------------------------------
+function renderTechnicianJobs(){
+  const box = document.getElementById('technicianJobList');
+  if(!box) return;
+  if(!TECHNICIAN_JOBS.length){
+    box.innerHTML = `<div class="job-item"><div class="job-info-text" style="text-align:center;">ตอนนี้ยังไม่มีงานที่ Admin แจกให้คุณ</div></div>`;
+    return;
+  }
+  box.innerHTML = TECHNICIAN_JOBS.map(job => {
+    const customerName = job.customer?.full_name || 'ลูกค้า';
+    const customerCode = job.customer?.customer_code || '-';
+    const address = job.property?.address || 'ไม่พบข้อมูลสถานที่';
+    const flow = JOB_STATUS_FLOW[job.status] || JOB_STATUS_FLOW.assigned;
+    const errorNote = job.device?.error_code ? ` (รหัส Error: ${job.device.error_code})` : '';
+
+    const nextButton = flow.next
+      ? `<button class="btn-action ${flow.next==='completed' ? 'success' : 'main'}"
+           onclick="updateJobStatus('${job.id}', '${flow.next}')">${flow.nextLabel}</button>`
+      : '';
+
+    const dateText = job.scheduled_date ? new Date(job.scheduled_date + 'T00:00:00').toLocaleDateString('th-TH') : '-';
+    const timeText = job.scheduled_time_slot ? String(job.scheduled_time_slot).slice(0,5) : '-';
+    const jobCode = job.job_code || job.id;
+    const bookingCode = job.booking?.booking_code || '-';
+
+    return `
+      <div class="job-item" id="job-${job.id}">
+        <div class="job-top">
+          <div class="customer-name">${customerName}</div>
+          <span class="status-tag ${flow.cls} status-tag-el">${flow.text}</span>
+        </div>
+        <div class="job-info-text">
+          ประเภทงาน: ${job.service_type || '-'}${errorNote}<br>
+          เวลานัดหมาย: ${dateText} ${timeText} น.<br>
+          สถานที่: ${address}
+        </div>
+        <div class="job-btn-grid">
+          <button class="btn-action sec" onclick="showJobDetail(
+              '${jobCode}', '${bookingCode}', '${customerCode}', '${customerName.replace(/'/g,"\\'")}',
+              '${(job.service_type||'-').replace(/'/g,"\\'")}', '${dateText} ${timeText} น.', '${address.replace(/'/g,"\\'")}'
+            )">1. รายละเอียด</button>
+          <a href="https://maps.google.com/?q=${encodeURIComponent(address)}" target="_blank" class="btn-action outline">2. นำทาง</a>
+          ${nextButton}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// -------------------------------
+// อัปเดตสถานะงานลง Supabase — ช่างเปลี่ยนได้เฉพาะ status (บังคับด้วย RLS/trigger)
+// -------------------------------
+async function updateJobStatus(jobId, newStatus){
+  const { error } = await supabaseClient
+    .from('job_orders')
+    .update({ status: newStatus })
+    .eq('id', jobId)
+    .eq('assigned_tech_id', TECHNICIAN_ID);
+  if(error){
+    console.error('อัปเดตสถานะงานไม่สำเร็จ:', error);
+    showToast('ไม่สามารถอัปเดตสถานะงานได้');
+    return;
+  }
+  showToast(`อัปเดตสถานะงานเรียบร้อย: ${JOB_STATUS_FLOW[newStatus]?.text || newStatus}`);
+  await loadTechnicianJobs();
+}
+
+function subscribeTechJobs(){
+  supabaseClient.channel('tech-jobs-' + TECHNICIAN_ID)
+    .on('postgres_changes', { event:'*', schema:'public', table:'job_orders',
+        filter:`assigned_tech_id=eq.${TECHNICIAN_ID}` },
+      () => { loadTechnicianJobs(); })
+    .subscribe();
+}
+
+// -------------------------------
+// อัปเดตตัวเลข Dashboard
+// -------------------------------
+function updateDashboardStats(){
+  const total =
+    TECHNICIAN_JOBS.length;
+  const completed =
+    TECHNICIAN_JOBS.filter(
+      job => job.status === 'completed'
+    ).length;
+  const inProgress =
+    TECHNICIAN_JOBS.filter(
+      job => ['ready','on_the_way','arrived','in_progress'].includes(job.status)
+    ).length;
+  const statTotal =
+    document.getElementById('statTotal');
+  const statCompleted =
+    document.getElementById('statCompleted');
+  const statInProg =
+    document.getElementById('statInProg');
+  const profileTotal =
+    document.getElementById('profileTotal');
+  const profileInProg =
+    document.getElementById('profileInProg');
+  const profileCompleted =
+    document.getElementById('profileCompleted');
+  if(statTotal){
+    statTotal.textContent = `${total} งาน`;
+  }
+  if(statCompleted){
+    statCompleted.textContent = `${completed} งาน`;
+  }
+  if(statInProg){
+    statInProg.textContent = `${inProgress} งาน`;
+  }
+  if(profileTotal){
+    profileTotal.textContent = `${total} งาน`;
+  }
+  if(profileInProg){
+    profileInProg.textContent = `${inProgress} งาน`;
+  }
+  if(profileCompleted){
+    profileCompleted.textContent = `${completed} งาน`;
+  }
+}
+
+// แสดงรายละเอียดงานตรงตามแดชบอร์ด
+function showJobDetail(jobId, bookingId, customerId, customer, jobType, time, address) {
+  openModal(`
+    <h3 style="font-size:15px; margin-bottom:12px; color:var(--text-main);">รายละเอียดงานบริการ</h3>
+    <div class="info-row"><span class="info-label">JOB ID</span><span class="info-val">${jobId}</span></div>
+    <div class="info-row"><span class="info-label">Booking ID</span><span class="info-val">${bookingId}</span></div>
+    <div class="info-row"><span class="info-label">รหัสลูกค้า</span><span class="info-val">${customerId}</span></div>
+    <div class="info-row"><span class="info-label">ชื่อลูกค้า</span><span class="info-val">${customer}</span></div>
+    <div class="info-row"><span class="info-label">ประเภทงาน</span><span class="info-val">${jobType}</span></div>
+    <div class="info-row"><span class="info-label">เวลานัดหมาย</span><span class="info-val">${time}</span></div>
+    <div class="info-row"><span class="info-label">สถานที่</span><span class="info-val">${address}</span></div>
+    <div class="info-row"><span class="info-label">พื้นที่ปฏิบัติงาน</span><span class="info-val">อำเภอเมืองอุดรธานี</span></div>
+    <div class="info-row"><span class="info-label">จุดนำทางเดโม่</span><span class="info-val">Thonburi University</span></div>
+  `);
+}
+
+// แต้มสะสม — ยอดตั้งต้นดึงจาก technician_points_totals (ผลรวมของ
+// technician_points_events จริง เช่น จากรีวิวลูกค้า) ไม่ใช่ค่าคงที่ในโค้ดอีกต่อไป.
+// การ "แลกโบนัส" ด้านล่างยังคงเป็นการจำลองผลในหน้าจอเท่านั้น เนื่องจากโปรเจกต์นี้
+// ยังไม่มีตาราง "รายการของรางวัลที่แลกได้" ฝั่งฐานข้อมูล — เป็นจุดที่ทำต่อได้ภายหลัง
+let userPoints = 0;
+async function loadPointsTotal(){
+  const { data } = await supabaseClient.from('technician_points_totals').select('total_points')
+    .eq('technician_id', TECHNICIAN_ID).maybeSingle();
+  userPoints = data?.total_points || 0;
+  const d1 = document.getElementById('pointsDisplay');
+  const d2 = document.getElementById('profilePoints');
+  if (d1) d1.textContent = userPoints.toLocaleString() + ' แต้ม';
+  if (d2) d2.textContent = userPoints.toLocaleString() + ' แต้ม';
+}
+function redeemBonus(name, points, elId) {
+  if(userPoints < points) {
+    showToast(`แต้มสะสมไม่เพียงพอ (ต้องการ ${points.toLocaleString()} แต้ม)`);
+    return;
+  }
+  openModal(`
+    <h3 style="font-size:15px; margin-bottom:12px;">ขอแลกสิทธิโบนัส</h3>
+    <div class="info-row"><span class="info-label">รายการ</span><span class="info-val">${name}</span></div>
+    <div class="info-row"><span class="info-label">แต้มที่ใช้</span><span class="info-val">${points.toLocaleString()} แต้ม</span></div>
+    <div class="info-row"><span class="info-label">แต้มคงเหลือ</span><span class="info-val">${(userPoints - points).toLocaleString()} แต้ม</span></div>
+    <div style="margin-top:12px; background:var(--blue-soft); padding:10px; border-radius:10px; font-size:11px; color:var(--text-main);">
+      <b>แอดมินตอบกลับ:</b> ตรวจสอบแต้มสะสมแล้วค่ะ สามารถแลกสิทธิ์ได้ค่ะ ยืนยันเพื่อดำเนินการต่อ
+    </div>
+    <button class="btn-action success" style="width:100%; margin-top:12px;" onclick="confirmBonus('${name}', ${points}, '${elId}')">ยืนยันการแลกสิทธิ์</button>
+  `);
+}
+function confirmBonus(name, points, elId) {
+  userPoints -= points;
+  document.getElementById('pointsDisplay').textContent = userPoints.toLocaleString() + ' แต้ม';
+  document.getElementById('profilePoints').textContent = userPoints.toLocaleString() + ' แต้ม';
+  closeModal();
+  showToast(`แลกสิทธิ์ "${name}" สำเร็จเรียบร้อย`);
+  const item = document.getElementById(elId);
+  if(item) {
+    item.style.opacity = '0.5';
+    const btn = item.querySelector('button');
+    if(btn) { btn.disabled = true; btn.textContent = 'แลกแล้ว'; }
+  }
+}
+
+// ระบบแชทส่งหาแอดมิน — ข้อความจริงใน chat_conversations/chat_messages
+// (technician_admin) แทนการจำลองข้อความตอบกลับในเครื่อง
+let techChatConversationId = null;
+
+async function ensureTechChatConversation(){
+  let { data } = await supabaseClient.from('chat_conversations').select('id')
+    .eq('technician_id', TECHNICIAN_ID).eq('type','technician_admin').maybeSingle();
+  if (!data) {
+    const ins = await supabaseClient.from('chat_conversations')
+      .insert({ type:'technician_admin', technician_id: TECHNICIAN_ID }).select('id').single();
+    if (ins.error) { showToast('เปิดห้องแชทไม่สำเร็จ'); return; }
+    data = ins.data;
+  }
+  techChatConversationId = data.id;
+}
+function renderTechChatBubble(m){
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = 'msg-bubble ' + (m.sender_role === 'technician' ? 'tech' : 'admin');
+  div.textContent = m.body;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+async function loadTechChatHistory(){
+  if (!techChatConversationId) return;
+  const { data } = await supabaseClient.from('chat_messages').select('*')
+    .eq('conversation_id', techChatConversationId).order('created_at');
+  const box = document.getElementById('chatBox');
+  box.innerHTML = '';
+  (data||[]).forEach(renderTechChatBubble);
+}
+function subscribeTechChat(){
+  if (!techChatConversationId) return;
+  supabaseClient.channel('tech-chat-' + techChatConversationId)
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages',
+        filter:`conversation_id=eq.${techChatConversationId}` },
+      payload => renderTechChatBubble(payload.new))
+    .subscribe();
+}
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const txt = input.value.trim();
+  if(!txt || !techChatConversationId) return;
+  input.value = '';
+  const { error } = await supabaseClient.from('chat_messages').insert({
+    conversation_id: techChatConversationId, sender_role: 'technician', sender_id: TECHNICIAN_ID, body: txt
+  });
+  if (error) { console.error(error); input.value = txt; showToast('ส่งข้อความไม่สำเร็จ: ' + (error.message || error)); }
+}
+</script>
+</body>
+</html>
